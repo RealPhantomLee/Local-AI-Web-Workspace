@@ -1,0 +1,18 @@
+services:
+  wetty:
+    image: wettyoss/wetty:latest
+    container_name: wetty
+    restart: unless-stopped
+    ports:
+      - "${WETTY_PORT:-3002}:3000"
+    environment:
+      SSHHOST: "${WETTY_SSH_HOST:-host.docker.internal}"
+      SSHPORT: "${WETTY_SSH_PORT:-22}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - local_ai_workspace
+
+networks:
+  local_ai_workspace:
+    external: true

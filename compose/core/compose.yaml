@@ -1,0 +1,35 @@
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anythingllm
+    restart: unless-stopped
+    ports:
+      - "${ANYTHINGLLM_PORT:-3001}:3001"
+    environment:
+      STORAGE_DIR: /app/server/storage
+      OLLAMA_BASE_PATH: "${OLLAMA_HOST:-http://host.docker.internal:11434}"
+      UID: "${APP_UID:-1000}"
+      GID: "${APP_GID:-1000}"
+    volumes:
+      - ../../docker-data/anythingllm/storage:/app/server/storage
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - local_ai_workspace
+
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-7575}:7575"
+    environment:
+      SECRET_ENCRYPTION_KEY: "${HOMARR_SECRET_ENCRYPTION_KEY:-CHANGE_ME_64_HEX}"
+    volumes:
+      - ../../docker-data/homarr/appdata:/appdata
+    networks:
+      - local_ai_workspace
+
+networks:
+  local_ai_workspace:
+    driver: bridge

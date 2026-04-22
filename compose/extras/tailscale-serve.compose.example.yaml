@@ -1,0 +1,11 @@
+# Example only.
+# Tailscale is usually installed on the host, and Serve is best handled
+# as a host-side access layer after local services are already working.
+
+# Suggested host-side mappings:
+#
+# tailscale serve --bg 7575
+# tailscale serve --bg 3001
+#
+# Or map named HTTPS handlers to local services after confirming
+# current Tailscale Serve syntax for your version.

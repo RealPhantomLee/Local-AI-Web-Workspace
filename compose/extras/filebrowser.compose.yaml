@@ -1,0 +1,17 @@
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    restart: unless-stopped
+    ports:
+      - "${FILEBROWSER_PORT:-8081}:80"
+    volumes:
+      - ../../workspace:/srv
+      - ../../docker-data/filebrowser/database:/database
+      - ../../docker-data/filebrowser/config:/config
+    networks:
+      - local_ai_workspace
+
+networks:
+  local_ai_workspace:
+    external: true
