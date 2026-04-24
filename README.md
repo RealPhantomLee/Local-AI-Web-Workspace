@@ -104,7 +104,19 @@ git clone https://github.com/RealPhantomLee/Local-AI-Web-Workspace.git
 cd Local-AI-Web-Workspace
 ```
 
-### 2) Run the installer
+### 2) Copy the environment file
+
+Copy the example environment file before starting the stack. The services will not start correctly without it.
+
+```bash
+cp .env.example .env
+```
+
+> Open `.env` in any text editor and review the values. The defaults work for a local setup, but you should change any credentials before long-term use.
+
+### 3) Run the installer
+
+The installer checks your prerequisites and starts the stack automatically.
 
 **Linux**
 ```bash
@@ -123,13 +135,19 @@ chmod +x scripts/install/macos.sh
 powershell -ExecutionPolicy Bypass -File .\scripts\install\windows.ps1
 ```
 
-### 3) Start the stack
+### 4) Verify the stack is running
 
 ```bash
-docker compose up -d
+docker compose -f compose/docker-compose.yml ps
 ```
 
-### 4) Pull a model with Ollama
+All listed containers should show a status of `Up`. If any show `Exit` or `Restarting`, check the logs:
+
+```bash
+docker compose -f compose/docker-compose.yml logs
+```
+
+### 5) Pull a model with Ollama
 
 ```bash
 ollama pull gemma3:latest
@@ -153,9 +171,9 @@ After installation, the main services should be available locally.
 
 ### Basic workflow
 
-1. Open Homarr in your browser
-2. Open AnythingLLM
-3. Connect AnythingLLM to your local Ollama endpoint
+1. Open Homarr in your browser at http://localhost:7575
+2. Open AnythingLLM at http://localhost:3001
+3. Connect AnythingLLM to your local Ollama endpoint (see below)
 4. Select a locally available model
 5. Start using your AI workspace
 6. Add optional services if you want more functionality
@@ -178,48 +196,69 @@ After installation, the main services should be available locally.
 
 ## Manual Setup
 
+If you prefer to configure the stack manually instead of running the installer, follow these steps.
+
 ### 1) Install Ollama
 
-Install Ollama using the official method for your operating system.
+Install Ollama using the official method for your operating system from https://ollama.com.
 
-### 2) Pull a model
+### 2) Copy the environment file
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set any credentials or ports you want to change before bringing the stack up.
+
+### 3) Pull a model
 
 ```bash
 ollama pull gemma3:latest
 ```
 
-### 3) Start the Docker services
+### 4) Start the Docker services
 
 ```bash
-docker compose up -d
+docker compose -f compose/docker-compose.yml up -d
 ```
 
-### 4) Verify the containers
+### 5) Verify the containers
 
 ```bash
-docker ps
+docker compose -f compose/docker-compose.yml ps
 ```
 
-### 5) Open the local services
+### 6) Open the local services
 
 - AnythingLLM: http://localhost:3001
 - Homarr: http://localhost:7575
 
-### 6) Connect AnythingLLM to Ollama
+### 7) Connect AnythingLLM to Ollama
 
-Use the Ollama host API endpoint:
+In AnythingLLM settings, set the LLM provider to **Ollama** and use this endpoint:
 
 ```
 http://host.docker.internal:11434
 ```
 
-If needed on Linux, use the host mapping or Compose configuration appropriate for your environment.
+**Linux users:** if `host.docker.internal` does not resolve, use your host machine's local IP address instead, or add the following to your `compose/docker-compose.yml` under the AnythingLLM service:
 
-### 7) Optional extras
+```yaml
+extra_hosts:
+  - "host.docker.internal:host-gateway"
+```
 
-If your Compose file includes optional services, bring them up as needed and access them through the browser once they are healthy.
+### 8) Optional extras
 
-### 8) Optional remote access
+If your Compose file includes optional services, bring them up as needed:
+
+```bash
+docker compose -f compose/docker-compose.yml up -d <service-name>
+```
+
+Access them through the browser once they show as healthy in `docker compose ps`.
+
+### 9) Optional remote access
 
 Enable Tailscale / Serve only after:
 
@@ -253,17 +292,31 @@ Local AI is built around a simple service flow:
 
 ### Ollama is not responding
 
+Check that Ollama is running and see which models are available:
+
 ```bash
 ollama list
 ```
 
-If needed, restart the Ollama service for your system.
+If Ollama is not running, start it with:
+
+```bash
+ollama serve
+```
 
 ### Docker containers are not starting
 
+Check container status and inspect logs:
+
 ```bash
-docker ps -a
-docker compose logs
+docker compose -f compose/docker-compose.yml ps -a
+docker compose -f compose/docker-compose.yml logs
+```
+
+A common cause is a missing `.env` file. Make sure you ran:
+
+```bash
+cp .env.example .env
 ```
 
 ### Port conflict
@@ -276,11 +329,28 @@ Common ports used here:
 - 7575 for Homarr
 - 11434 for Ollama
 
-Update the Compose or environment configuration if needed.
+To use a different port, update the relevant value in your `.env` file and restart the stack:
+
+```bash
+docker compose -f compose/docker-compose.yml down
+docker compose -f compose/docker-compose.yml up -d
+```
 
 ### AnythingLLM cannot reach Ollama
 
-Verify that Ollama is running and that the API endpoint is correct. Confirm the Ollama endpoint manually and make sure the correct host mapping is being used for your operating system.
+Verify Ollama is running:
+
+```bash
+ollama list
+```
+
+Then confirm the endpoint in AnythingLLM settings is set to:
+
+```
+http://host.docker.internal:11434
+```
+
+On Linux, if that does not resolve, add `extra_hosts: - "host.docker.internal:host-gateway"` under the AnythingLLM service in `compose/docker-compose.yml`.
 
 ### Model is missing
 
@@ -305,8 +375,12 @@ Make sure:
 ```
 Local-AI-Web-Workspace/
 ├── README.md
-├── docker-compose.yml
 ├── .env.example
+├── .gitignore
+├── .gitattributes
+├── LICENSE
+├── compose/
+│   └── docker-compose.yml
 ├── scripts/
 │   └── install/
 │       ├── linux.sh
@@ -315,19 +389,18 @@ Local-AI-Web-Workspace/
 ├── docs/
 │   └── images/
 │       └── local-ai-architecture.png
-├── configs/
-└── services/
+├── bootstrap/
+└── templates/
 ```
 
 | Path | Purpose |
 |---|---|
-| README.md | Project overview, installation, usage, and troubleshooting |
-| docker-compose.yml | Starts the local service stack |
-| .env.example | Example environment settings |
-| scripts/install/ | Installer scripts by operating system |
-| docs/images/ | Diagrams and README images |
-| configs/ | Service or application configuration |
-| services/ | Service-specific files and definitions |
+| `.env.example` | Copy this to `.env` before starting the stack |
+| `compose/` | Docker Compose file for the service stack |
+| `scripts/install/` | Installer scripts by operating system |
+| `docs/images/` | Architecture diagram and README images |
+| `bootstrap/` | First-run or initialization helpers |
+| `templates/` | Configuration templates for services |
 
 ---
 
@@ -384,5 +457,3 @@ If you choose to enable remote features, do so carefully and with clear authoriz
 ## License
 
 License terms for this repository should be taken from the LICENSE file in this project.
-
-If no LICENSE file has been added yet, add one before publishing reuse terms.
