@@ -99,39 +99,41 @@ More RAM, storage, and CPU/GPU resources will improve the experience when runnin
 
 ### 1) Clone the repository
 
-\`\`\`bash
+```bash
 git clone https://github.com/RealPhantomLee/Local-AI-Web-Workspace.git
 cd Local-AI-Web-Workspace
-\`\`\`
+```
 
 ### 2) Run the installer
 
 **Linux**
-\`\`\`bash
+```bash
 chmod +x scripts/install/linux.sh
 ./scripts/install/linux.sh
-\`\`\`
+```
 
 **macOS**
-\`\`\`bash
+```bash
 chmod +x scripts/install/macos.sh
 ./scripts/install/macos.sh
-\`\`\`
+```
 
 **Windows (PowerShell)**
-\`\`\`powershell
+```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\install\windows.ps1
-\`\`\`
+```
 
 ### 3) Start the stack
-\`\`\`bash
+
+```bash
 docker compose up -d
-\`\`\`
+```
 
 ### 4) Pull a model with Ollama
-\`\`\`bash
+
+```bash
 ollama pull gemma3:latest
-\`\`\`
+```
 
 You can replace that with any model supported by your setup.
 
@@ -181,19 +183,22 @@ After installation, the main services should be available locally.
 Install Ollama using the official method for your operating system.
 
 ### 2) Pull a model
-\`\`\`bash
+
+```bash
 ollama pull gemma3:latest
-\`\`\`
+```
 
 ### 3) Start the Docker services
-\`\`\`bash
+
+```bash
 docker compose up -d
-\`\`\`
+```
 
 ### 4) Verify the containers
-\`\`\`bash
+
+```bash
 docker ps
-\`\`\`
+```
 
 ### 5) Open the local services
 
@@ -204,9 +209,9 @@ docker ps
 
 Use the Ollama host API endpoint:
 
-\`\`\`
+```
 http://host.docker.internal:11434
-\`\`\`
+```
 
 If needed on Linux, use the host mapping or Compose configuration appropriate for your environment.
 
@@ -247,22 +252,26 @@ Local AI is built around a simple service flow:
 ## Common Issues
 
 ### Ollama is not responding
-\`\`\`bash
+
+```bash
 ollama list
-\`\`\`
+```
+
 If needed, restart the Ollama service for your system.
 
 ### Docker containers are not starting
-\`\`\`bash
+
+```bash
 docker ps -a
 docker compose logs
-\`\`\`
+```
 
 ### Port conflict
 
 If a service will not start, another application may already be using the port.
 
 Common ports used here:
+
 - 3001 for AnythingLLM
 - 7575 for Homarr
 - 11434 for Ollama
@@ -274,14 +283,16 @@ Update the Compose or environment configuration if needed.
 Verify that Ollama is running and that the API endpoint is correct. Confirm the Ollama endpoint manually and make sure the correct host mapping is being used for your operating system.
 
 ### Model is missing
-\`\`\`bash
+
+```bash
 ollama list
 ollama pull gemma3:latest
-\`\`\`
+```
 
 ### Tailscale / Serve is not working
 
 Make sure:
+
 - local access works first
 - Tailscale is installed and authenticated
 - the service you want to expose is already healthy
@@ -291,7 +302,7 @@ Make sure:
 
 ## Project Structure
 
-\`\`\`
+```
 Local-AI-Web-Workspace/
 ├── README.md
 ├── docker-compose.yml
@@ -306,7 +317,7 @@ Local-AI-Web-Workspace/
 │       └── local-ai-architecture.png
 ├── configs/
 └── services/
-\`\`\`
+```
 
 | Path | Purpose |
 |---|---|
@@ -345,6 +356,7 @@ Local-AI-Web-Workspace/
 This project is intended for use on systems and environments you own, manage, or are explicitly authorized to administer.
 
 Users are responsible for:
+
 - Complying with local laws and regulations
 - Respecting software licenses
 - Securing exposed services
